@@ -68,6 +68,7 @@ public class IngredientServiceImpl implements IngredientService {
                 .filter(ingredient -> ingredient.getId().equals(command.getId()))
                 .findFirst();
 
+
         if (optionalIngredient.isPresent()) {
             Ingredient ingredient = optionalIngredient.get();
             ingredient.setDescription(command.getDescription());

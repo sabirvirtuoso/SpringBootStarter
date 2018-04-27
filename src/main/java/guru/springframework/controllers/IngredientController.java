@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Slf4j
 @Controller
@@ -70,7 +71,7 @@ public class IngredientController {
     }
 
     @PostMapping("/recipe/{recipeId}/ingredient")
-    public String saveRecipeIngredient(@ModelAttribute IngredientCommand ingredientCommand) {
+    public String saveRecipeIngredient(@ModelAttribute IngredientCommand ingredientCommand, RedirectAttributes redirectAttributes) {
         IngredientCommand savedCommand = ingredientService.saveIngredientCommand(ingredientCommand);
 
         log.debug("Saved Ingredient has id : " + savedCommand.getId());

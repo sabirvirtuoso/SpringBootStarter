@@ -4,8 +4,11 @@ import guru.springframework.domain.*;
 import guru.springframework.repositories.CategoryRepository;
 import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
+import guru.springframework.services.RoleService;
+import guru.springframework.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,23 +23,93 @@ import java.util.Optional;
  */
 @Slf4j
 @Component
+@Profile({"default"})
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     private final CategoryRepository categoryRepository;
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
 
-    public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository) {
+    private final UserService userService;
+    private final RoleService roleService;
+
+    public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository, UserService userService, RoleService roleService) {
         this.categoryRepository = categoryRepository;
         this.recipeRepository = recipeRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
+
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     @Override
     @Transactional
     public void onApplicationEvent(ContextRefreshedEvent event) {
         recipeRepository.saveAll(getRecipes());
+
+        loadUsers();
+        loadRoles();
+
+        assignUserToUserRole();
+        assignUserToAdminRole();
+
         log.debug("Loading Bootstrap Data");
+    }
+
+    private void loadUsers() {
+        User user1 = new User();
+        user1.setUserName("user");
+        user1.setPassword("user");
+        userService.saveOrUpdate(user1);
+
+        User user2 = new User();
+        user2.setUserName("admin");
+        user2.setPassword("admin");
+        userService.saveOrUpdate(user2);
+    }
+
+    private void loadRoles() {
+        Role role = new Role();
+        role.setRole("USER");
+        roleService.saveOrUpdate(role);
+        log.info("Saved role" + role.getRole());
+
+        Role adminRole = new Role();
+        adminRole.setRole("ADMIN");
+        roleService.saveOrUpdate(adminRole);
+        log.info("Saved role" + adminRole.getRole());
+    }
+
+    private void assignUserToUserRole() {
+        List<User> users = userService.listAll();
+        List<Role> roles = roleService.listAll();
+
+        roles.forEach(role -> {
+            if (role.getRole().equalsIgnoreCase("USER")) {
+                users.forEach(user -> {
+                    if (user.getUserName().equalsIgnoreCase("user")) {
+                        user.addRole(role);
+                        userService.saveOrUpdate(user);
+                    }
+                });
+            }
+        });
+    }
+
+    private void assignUserToAdminRole() {
+        List<User> users = userService.listAll();
+        List<Role> roles = roleService.listAll();
+
+        roles.forEach(role -> {
+            if (role.getRole().equalsIgnoreCase("ADMIN")) {
+                users.forEach(user -> {
+                    if (user.getUserName().equalsIgnoreCase("admin")) {
+                        user.addRole(role);
+                        userService.saveOrUpdate(user);
+                    }
+                });
+            }
+        });
     }
 
     private List<Recipe> getRecipes() {
