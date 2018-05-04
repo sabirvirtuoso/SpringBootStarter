@@ -75,6 +75,28 @@
             </div>
         </div>
     </div>
+
+    <!-- For pagination purpose -->
+    <div class="row">
+        <div th:if="${recipes.totalPages != 1}" class="form-group col-md-6 col-md-offset-3 pagination-centered">
+            <ul class="pagination">
+                <li th:class="${recipes.number == 0} ? disabled"><a class="pageLink" th:href="@{/(pageSize=1, page=1)}">«</a>
+                </li>
+                <li th:class="${recipes.number == 0} ? disabled"><a class="pageLink" th:href="@{/(pageSize=1, page=${recipes.number})}">←</a>
+                </li>
+                <li th:class="${recipes.number == (page - 1)} ? 'active pointer-disabled'"
+                        th:each="page : ${#numbers.sequence(pager.startPage, pager.endPage)}">
+                    <a class="pageLink" th:href="@{/(pageSize=1, page=${page})}" th:text="${page}"></a>
+                </li>
+                <li th:class="${recipes.number + 1 == recipes.totalPages} ? disabled">
+                    <a class="pageLink" th:href="@{/(pageSize=1, page=${recipes.number + 2})}">→</a>
+                </li>
+                <li th:class="${recipes.number + 1 == recipes.totalPages} ? disabled">
+                    <a class="pageLink" th:href="@{/(pageSize=1, page=${recipes.totalPages})}">»</a>
+                </li>
+            </ul>
+        </div>
+    </div>
 </div>
 
 </body>

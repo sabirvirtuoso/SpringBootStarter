@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -67,7 +68,6 @@ public class IngredientServiceImpl implements IngredientService {
         Optional<Ingredient> optionalIngredient = recipe.getIngredients().stream()
                 .filter(ingredient -> ingredient.getId().equals(command.getId()))
                 .findFirst();
-
 
         if (optionalIngredient.isPresent()) {
             Ingredient ingredient = optionalIngredient.get();

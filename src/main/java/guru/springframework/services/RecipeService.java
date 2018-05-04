@@ -2,6 +2,8 @@ package guru.springframework.services;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.domain.Recipe;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.Set;
 
@@ -11,6 +13,8 @@ import java.util.Set;
 public interface RecipeService {
 
     Set<Recipe> getRecipes();
+
+    Page<Recipe> getPaginatedRecipes(PageRequest pageRequest);
 
     Recipe findById(Long l);
 
